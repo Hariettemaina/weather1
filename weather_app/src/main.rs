@@ -1,6 +1,7 @@
 use crate::graphql::QueryRoot;
 use actix_cors::Cors;
-use actix_web::{web, App, HttpServer};
+use actix_files::Files;
+use actix_web::{web, App, HttpResponse, HttpServer};
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use diesel_async::pooled_connection::{deadpool::Pool, AsyncDieselConnectionManager};
@@ -50,6 +51,10 @@ async fn main() -> std::io::Result<()> {
                     .guard(actix_web::guard::Post())
                     .to(graphql_handler),
             )
+            .service(Files::new("/", "./path/to/your/nextjs/build").index_file("index.html"))
+            // .default_service(
+            //     web::route().to(|| HttpResponse::NotFound().body("404 Not Found"))
+            // )
     })
     .bind("0.0.0.0:8080")?
     .run()
